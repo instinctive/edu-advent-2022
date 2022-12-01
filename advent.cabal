@@ -1,0 +1,94 @@
+cabal-version: 3.0
+version: 1.0.0.0
+name: advent
+-- vim: foldmethod=marker
+
+common ghc2021 -- {{{
+  -- https://www.reddit.com/r/haskell/comments/kzxsve/ghc_2021/
+  -- https://github.com/ghc-proposals/ghc-proposals/blob/master/proposals/0380-ghc2021.rst
+  default-extensions:
+    -- Syntax:
+    BangPatterns
+    EmptyCase
+    ImportQualifiedPost
+    NamedFieldPuns
+    PostfixOperators
+    TupleSections
+    -- Literals:
+    BinaryLiterals
+    HexFloatLiterals
+    NumericUnderscores
+    -- Types:
+    ConstraintKinds
+    ExistentialQuantification
+    GADTSyntax
+    PolyKinds
+    RankNTypes
+    StandaloneKindSignatures
+    TypeApplications
+    TypeOperators
+    -- Not part of GHC2021 but implied by TypeOperators
+    ExplicitNamespaces
+    -- Type signatures:
+    ExplicitForAll
+    KindSignatures
+    NamedWildCards
+    ScopedTypeVariables
+    -- Class and instances declarations:
+    ConstrainedClassMethods
+    FlexibleContexts
+    FlexibleInstances
+    InstanceSigs
+    MultiParamTypeClasses
+    TypeSynonymInstances
+    -- Deriving mechanism:
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveLift
+    DeriveTraversable
+    EmptyDataDeriving
+    GeneralisedNewtypeDeriving
+    StandaloneDeriving
+  -- }}}
+
+common shared -- {{{
+  import: ghc2021
+  default-language: Haskell2010
+  ghc-options: +RTS -V0 -RTS -rtsopts -O2
+  mixins: base hiding (Prelude), base-prelude (BasePrelude as Prelude)
+  default-extensions:
+    BlockArguments
+    CPP
+    DataKinds
+    DerivingVia
+    ImplicitParams
+    LambdaCase
+    MonadComprehensions
+    MultiWayIf
+    RecordWildCards
+    TransformListComp
+    TypeFamilies
+    ViewPatterns
+  build-depends: base, base-prelude
+   , MonadRandom
+   , array
+   , containers
+   , lens
+   , monoidal-containers
+   , random
+   , random-shuffle
+   , split
+   , text
+  -- }}}
+
+executable foo
+  import: shared
+  main-is: Foo.lhs
+  ghc-options: -pgmL markdown-unlit -I.
+
+executable day01
+  import: shared
+  main-is: day01.hs
+  ghc-options: -main-is Day01
