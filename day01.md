@@ -1,4 +1,4 @@
-# Day 1: Calorie Counting
+# [Day 1: Calorie Counting](https://adventofcode.com/2022/day/1)
 
 This is a standard two-part problem:
 
