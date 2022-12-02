@@ -11,47 +11,74 @@ main :: IO ()
 main = getContents >>= printBoth . solve
 
 solve :: String -> (Int,Int)
-solve = lines                       -- split into lines
-    >>> map (uncurry score . parse) -- score each round
-    >>> sum                         -- add it all up
-    >>> (,) <*> const 0             -- return parts one and two
+solve = lines               -- split into lines
+    >>> map (score . parse) -- score each round
+    >>> sum                 -- add it all up
+    >>> (,) <*> const 0     -- return parts one and two
 ```
 
-Representing Rock Paper Scissors. We're going to go the extra mile and tag each
-move with who the player is. We'll also tag the outcomes with the players.
-We'll use the type system for this: each move and outcome will carry the
-evidence in the type.
+## Representing Rock Paper Scissors
+
+We're going to go the extra mile and tag each move with the player. We'll also
+tag the outcomes with the players.  We'll use the type system for this: each
+move and outcome will carry the evidence in the type.
+
+A ``Round`` is two moves played against each other.
 
 ```haskell
 data Player      = Us   | Them
 data Move    a   = Rock | Paper | Scissors deriving (Eq,Ord,Show)
 data Outcome a b = Loss | Tie   | Win      deriving (Eq,Ord,Show)
+type Round   a b = (Move a, Move b)
 ```
 
-The result of ``play a b`` is the ``Outcome`` of ``a`` with respect to ``b``.
-For example,
+The outcome of a ``Round a b`` is an ``Outcome a b``, which is a loss, tie, or
+win from ``a``'s point of view. For example,
 
-$$\hbox{\tt play Paper Rock}\Rightarrow\hbox{\tt Win}$$
+$$\hbox{\tt outcome (Round Paper Rock)}\Rightarrow\hbox{\tt Win}$$
 
-indicating that ``Paper`` wins over ``Rock``.
+indicates that ``Paper`` wins over ``Rock``.
 
 ```haskell
-outcome :: Move a -> Move b -> Outcome a b
-outcome Rock     Scissors = Win
-outcome Rock     Paper    = Loss
-outcome Scissors Paper    = Win
-outcome Scissors Rock     = Loss
-outcome Paper    Rock     = Win
-outcome Paper    Scissors = Loss
-outcome _ _ = Tie
+outcome :: Round a b -> Outcome a b
+outcome = \case
+    ( Rock     , Scissors ) -> Win
+    ( Rock     , Paper    ) -> Loss
+    ( Scissors , Paper    ) -> Win
+    ( Scissors , Rock     ) -> Loss
+    ( Paper    , Rock     ) -> Win
+    ( Paper    , Scissors ) -> Loss
+    _ -> Tie
 ```
 
-We need to parse the player moves from the input. Note that the input has the
-opponent's move first. This is a nice source of bugs, hence the tagging of all
-the moves and outcomes with the players.
+## Scoring
+
+Our score is based on what we chose and the outcome of the round.
 
 ```haskell
-parse :: String -> (Move 'Us, Move 'Them)
+score :: Round 'Us 'Them -> Int
+score round@(us,_) = moveValue us + outcomeValue (outcome round)
+
+moveValue :: Move 'Us -> Int
+moveValue Rock     = 1
+moveValue Paper    = 2
+moveValue Scissors = 3
+
+outcomeValue :: Outcome 'Us 'Them -> Int
+outcomeValue Loss = 0
+outcomeValue Tie  = 3
+outcomeValue Win  = 6
+```
+
+## Parsing
+
+We need to parse the rounds from the input. Note that the input has the
+opponent's move first. Two identical types with an arbitrary ordering can be a
+nice source of bugs, hence the tagging of all the moves and outcomes with the
+players type information.
+
+```haskell
+parse :: String -> Round 'Us 'Them
 parse s = (parseMove us, parseMove them) where
     [them,us] = words s
 
@@ -63,21 +90,4 @@ parseMove "X" = Rock
 parseMove "Y" = Paper
 parseMove "Z" = Scissors
 parseMove e = error $ "invalid move: " <> show e
-```
-
-Our score is based on what we chose and the outcome of "us" playing "them".
-
-```haskell
-score :: Move 'Us -> Move 'Them -> Int
-score us them = moveValue us + outcomeValue (outcome us them)
-
-moveValue :: Move 'Us -> Int
-moveValue Rock     = 1
-moveValue Paper    = 2
-moveValue Scissors = 3
-
-outcomeValue :: Outcome 'Us 'Them -> Int
-outcomeValue Loss = 0
-outcomeValue Tie  = 3
-outcomeValue Win  = 6
 ```
