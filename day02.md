@@ -31,7 +31,7 @@ data Outcome a b = Loss | Tie   | Win      deriving (Eq,Ord,Show)
 The result of ``play a b`` is the ``Outcome`` of ``a`` with respect to ``b``.
 For example,
 
-$${\tt play Paper Rock}\Rightarrow{\tt Win}$$
+$$\hbox{\tt play Paper Rock}\;\Rightarrow\;{\tt Win}$$
 
 indicating that ``Paper`` wins over ``Rock``.
 
