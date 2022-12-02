@@ -46,7 +46,9 @@ outcome Paper    Scissors = Loss
 outcome _ _ = Tie
 ```
 
-We need to parse the player moves from the input.
+We need to parse the player moves from the input. Note that the input has the
+opponent's move first. This is a nice source of bugs, hence the tagging of all
+the moves and outcomes with the players.
 
 ```haskell
 parse :: String -> (Move 'Us, Move 'Them)
