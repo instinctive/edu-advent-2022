@@ -86,4 +86,4 @@ common shared -- {{{
 executable day01
   import: shared
   main-is: day01.lhs
-  ghc-options: -pgmL markdown-unlit -I.
+  ghc-options: -pgmL markdown-unlit -I./include

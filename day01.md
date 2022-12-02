@@ -1,7 +1,7 @@
 # [Day 1: Calorie Counting](https://adventofcode.com/2022/day/1)
 
 ```haskell
-#include "include/prelude.hs"
+#include "prelude.hs"
 ```
 
 This is a standard two-part problem:
