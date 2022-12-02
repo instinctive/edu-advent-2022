@@ -34,9 +34,7 @@ type Round   a b = (Move a, Move b)
 
 The outcome of a ``Round a b`` is an ``Outcome a b``, which is a loss, tie, or
 win from ``a``'s point of view. For example,
-$$\leftline{$\displaystyle\hbox{\strut\hskip 2em\tt outcome (Paper, Rock)}
-  \Rightarrow
-  \hbox{\tt Win}$}$$
+$$\hbox{\tt outcome (Paper, Rock)}\Rightarrow\hbox{\tt Win}$$
 indicates that ``Paper`` wins over ``Rock``.
 
 ```haskell
