@@ -35,7 +35,7 @@ type Round   a b = (Move a, Move b)
 The outcome of a ``Round a b`` is an ``Outcome a b``, which is a loss, tie, or
 win from ``a``'s point of view. For example,
 
-$$\hbox{\tt outcome (Round Paper Rock)}\Rightarrow\hbox{\tt Win}$$
+$$\hbox{\tt outcome (Paper, Rock)}\Rightarrow\hbox{\tt Win}$$
 
 indicates that ``Paper`` wins over ``Rock``.
 
@@ -74,8 +74,8 @@ outcomeValue Win  = 6
 
 We need to parse the rounds from the input. Note that the input has the
 opponent's move first. Two identical types with an arbitrary ordering can be a
-nice source of bugs, hence the tagging of all the moves and outcomes with the
-players type information.
+nice source of bugs, hence the tagging of moves and outcomes with player type
+information.
 
 ```haskell
 parse :: String -> Round 'Us 'Them
