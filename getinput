@@ -14,6 +14,5 @@ KEYFILE="session.key"
 
 url="https://adventofcode.com/2022/day/${1}/input"
 key=`cat ${KEYFILE}`
-out=$(printf "./i/%02d" ${1})
 
-curl -o ${out} --cookie "session=${key}" ${url}
+curl --cookie "session=${key}" ${url}
