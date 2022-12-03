@@ -6,7 +6,7 @@ import Linear.V2
 import Control.Arrow   ( (>>>) )
 import Data.List.Split ( chunksOf, splitOn )
 
-import qualified Data.IntSet as IS
+import qualified Data.Set as S
 
 paragraphs :: [String] -> [[String]]
 paragraphs = splitOn [""]

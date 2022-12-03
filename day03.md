@@ -27,12 +27,11 @@ intersection of the sets of items in each compartment.
 
 ```haskell
 partOne :: String -> Int
-partOne raw = answer where
-    [answer] = IS.elems $ IS.intersection one two
-    one = IS.fromList $ take half cooked
-    two = IS.fromList $ drop half cooked
-    cooked = map priority raw
-    half = length raw `div` 2
+partOne sack = priority answer where
+    [answer] = S.elems $ S.intersection one two
+    one = S.fromList $ take half sack
+    two = S.fromList $ drop half sack
+    half = length sack `div` 2
 ```
 
 ## Part Two
@@ -42,6 +41,7 @@ in the intersection of each elf's rucksack.
 
 ```haskell
 partTwo :: [String] -> Int
-partTwo raw = answer where
-    [answer] = IS.elems $ foldl1' IS.intersection cooked
-    cooked = map (IS.fromList . map priority) raw
+partTwo sacks = priority answer where
+    [answer] = S.elems
+        $ foldl1' S.intersection 
+        $ map S.fromList sacks
