@@ -20,8 +20,6 @@ priority c | 'a' <= c && c <= 'z' = ord c - ord 'a' + 1
 priority c | 'A' <= c && c <= 'Z' = ord c - ord 'A' + 27
 ```
 
-score
-
 ## Part One
 
 The score for each rucksack is the priority of the item that appears in the
