@@ -2,13 +2,9 @@
 
 ```haskell
 #include "prelude.hs"
-```
 
-This is a standard two-part problem:
-
-``` haskell
 main :: IO ()
-main = getContents >>= printBoth . solve
+main = getContents >>= void . each print . solve
 
 solve :: String -> (Int,Int)
 solve = lines                       -- split into lines
