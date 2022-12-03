@@ -4,7 +4,7 @@
 #include "prelude.hs"
 ```
 
-This is a standard two-part problem:
+This is a standard two-part problem (part two not implemented yet):
 
 ```haskell
 main :: IO ()
