@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# vim: filetype=bash
+# ----------------------------------------------------------------------
+# Test all Advent of Code solutions.
+
+for day in `ls i`; do
+    if ! $(cabal run day${day} -v0 < i/${day} | diff - o/${day}); then
+        >&2 echo "FAILED: day${day}"
+    else
+        >&2 echo "day${day} passed"
+    fi
+done
