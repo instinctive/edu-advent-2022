@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# vim: filetype=bash
 # ----------------------------------------------------------------------
 # Get the puzzle input for the given day.
 #
