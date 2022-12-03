@@ -56,7 +56,7 @@ common ghc2021 -- {{{
 common shared -- {{{
   import: ghc2021
   default-language: Haskell2010
-  ghc-options: +RTS -V0 -RTS -rtsopts -O2
+  ghc-options: +RTS -V0 -RTS -rtsopts -O2 -pgmL markdown-unlit -I./include
   mixins: base hiding (Prelude), base-prelude (BasePrelude as Prelude)
   default-extensions:
     BlockArguments
@@ -86,9 +86,7 @@ common shared -- {{{
 executable day01
   import: shared
   main-is: day01.lhs
-  ghc-options: -pgmL markdown-unlit -I./include
 
 executable day02
   import: shared
   main-is: day02.lhs
-  ghc-options: -pgmL markdown-unlit -I./include
