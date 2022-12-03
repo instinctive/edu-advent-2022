@@ -2,60 +2,98 @@
 
 ```haskell
 #include "prelude.hs"
-```
 
-This is a standard two-part problem (part two not implemented yet):
-
-```haskell
 main :: IO ()
-main = getContents >>= printBoth . solve
+main = getContents >>= void . each print . solve
 
-solve :: String -> (Int,Int)
+solve :: String -> V2 Int   -- contains parts one and two
 solve = lines               -- split into lines
     >>> map (score . parse) -- score each round
     >>> sum                 -- add it all up
-    >>> (,) <*> const 0     -- return parts one and two
 ```
 
 ## Representing Rock Paper Scissors
 
-We're going to go the extra mile and tag each move with the player. We'll also
-tag the outcomes with the players.  We'll use the type system for this: each
-move and outcome will carry the evidence in the type.
-
-A ``Round`` is two moves played against each other.
+Here ``Player`` is used to supply the phantom types ``'Us`` and ``'Them`` (via
+the ``DataKinds`` extension).  We'll tag each move with the player, and the
+outcomes with both players, using these
+[phantom types](https://wiki.haskell.org/Phantom_type).
 
 ```haskell
 data Player      = Us   | Them
 data Move    a   = Rock | Paper | Scissors deriving (Eq,Ord,Show)
 data Outcome a b = Loss | Tie   | Win      deriving (Eq,Ord,Show)
-type Round   a b = (Move a, Move b)
 ```
 
-The outcome of a ``Round a b`` is an ``Outcome a b``, which is a loss, tie, or
-win from ``a``'s point of view. For example,
-$$\hbox{\tt outcome (Paper, Rock)}\Rightarrow\hbox{\tt Win}$$
-indicates that ``Paper`` wins over ``Rock``.
+### Part One
+
+An ``Outcome a b`` is the outcome from ``a``'s point of view.
+For example,
+$$\hbox{\tt getOutcome Paper Rock}\Rightarrow\hbox{\tt Win}$$
+indicates that when paper fights rock, it wins.
+
+This is the "truth table" for Rock Paper Scissors:
 
 ```haskell
-outcome :: Round a b -> Outcome a b
-outcome = \case
-    ( Rock     , Scissors ) -> Win
-    ( Rock     , Paper    ) -> Loss
-    ( Scissors , Paper    ) -> Win
-    ( Scissors , Rock     ) -> Loss
-    ( Paper    , Rock     ) -> Win
-    ( Paper    , Scissors ) -> Loss
-    _ -> Tie
+getOutcome :: Move a -> Move b -> Outcome a b
+getOutcome Paper    Paper    = Tie
+getOutcome Paper    Rock     = Win
+getOutcome Paper    Scissors = Loss
+getOutcome Rock     Paper    = Loss
+getOutcome Rock     Rock     = Tie
+getOutcome Rock     Scissors = Win
+getOutcome Scissors Paper    = Win
+getOutcome Scissors Rock     = Loss
+getOutcome Scissors Scissors = Tie
 ```
 
-## Scoring
+### Part Two
 
-Our score is based on what we chose and the outcome of the round.
+The move we choose will depend on the desired outcome and the move our opponent
+chose. For example,
+$$\hbox{\tt chooseMove Loss Scissors}\Rightarrow\hbox{\tt Paper}$$
+indicates that to lose against scissors we must choose paper.
+
+This is the same truth table, "inverted":
 
 ```haskell
-score :: Round 'Us 'Them -> Int
-score round@(us,_) = moveValue us + outcomeValue (outcome round)
+chooseMove :: Outcome a b -> Move b -> Move a
+chooseMove Loss Paper    = Rock
+chooseMove Loss Rock     = Scissors
+chooseMove Loss Scissors = Paper
+chooseMove Tie  Paper    = Paper
+chooseMove Tie  Rock     = Rock
+chooseMove Tie  Scissors = Scissors
+chooseMove Win  Paper    = Scissors
+chooseMove Win  Rock     = Paper
+chooseMove Win  Scissors = Rock
+```
+
+## Parsing and Scoring a Round
+
+Parts one and two interpret the second letter of each round's input differently.
+We capture each interpretation in the elements of the pair.
+
+The ``Round`` type is the output of ``parse`` and the input to ``score``.
+It is annotated with the player type information.
+
+```haskell
+type Round = (Move 'Them, (Move 'Us, Outcome 'Us 'Them))
+```
+
+### Scoring
+
+Our score is based on the move we chose and the outcome of the round.  For each
+of parts one and two, we are given only one of our two scoring features and
+must compute the other.
+
+```haskell
+score :: Round -> V2 Int
+score (them, (us1, out2)) = V2 one two where
+    one  = moveValue us1 + outcomeValue out1
+    two  = moveValue us2 + outcomeValue out2
+    us2  = chooseMove out2 them
+    out1 = getOutcome us1 them
 
 moveValue :: Move 'Us -> Int
 moveValue Rock     = 1
@@ -68,17 +106,20 @@ outcomeValue Tie  = 3
 outcomeValue Win  = 6
 ```
 
-## Parsing
+### Parsing
 
-We need to parse the rounds from the input. Note that the input has the
-opponent's move first. Two identical types with an arbitrary ordering can be a
-nice source of bugs, hence the tagging of moves and outcomes with player type
-information.
+For each round, the first letter of the input is the opponent's move. The
+second letter is interpreted differently for each part: part one interprets it
+as a move, and part two interprets it as the desired outcome from our point of
+view.
 
 ```haskell
-parse :: String -> Round 'Us 'Them
-parse s = (parseMove us, parseMove them) where
-    [them,us] = words s
+parse :: String -> Round
+parse (words -> [first,second]) = (them, (us, out))
+  where
+    them = parseMove first
+    us   = parseMove second
+    out  = parseOutcome second
 
 parseMove :: String -> Move a
 parseMove "A" = Rock
@@ -87,5 +128,9 @@ parseMove "C" = Scissors
 parseMove "X" = Rock
 parseMove "Y" = Paper
 parseMove "Z" = Scissors
-parseMove e = error $ "invalid move: " <> show e
+
+parseOutcome :: String -> Outcome a b
+parseOutcome "X" = Loss
+parseOutcome "Y" = Tie
+parseOutcome "Z" = Win
 ```

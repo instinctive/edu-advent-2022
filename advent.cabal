@@ -76,6 +76,7 @@ common shared -- {{{
    , array
    , containers
    , lens
+   , linear
    , monoidal-containers
    , random
    , random-shuffle
