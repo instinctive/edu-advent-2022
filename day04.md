@@ -4,12 +4,12 @@
 #include "prelude.hs"
 
 main :: IO ()
-main = getContents >>= print . solve
+main = getContents >>= void . both print . solve
 
-solve :: String -> Int
+solve :: String -> (Int,Int)
 solve = lines
-    >>> map (partOne . parse)
-    >>> sum
+    >>> map ((partOne &&& partTwo) . parse)
+    >>> bimap sum sum . unzip
 ```
 
 ## Parsing
@@ -38,4 +38,15 @@ partOne = bool 0 1 . test where
     isWithin a b =
         _lo a >= _lo b &&
         _hi a <= _hi b
+```
+
+## Part Two
+
+Return ``1`` if one range overlaps with the other, and ``0`` otherwise.
+
+```haskell
+partTwo :: Pairing -> Int
+partTwo = bool 0 1 . overlaps where
+    overlaps (a,b) =
+        _lo a <= _hi b && _hi a >= _lo b
 ```
