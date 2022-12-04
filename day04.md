@@ -6,10 +6,10 @@
 main :: IO ()
 main = getContents >>= void . both print . solve
 
-solve :: String -> (Int,Int)
-solve = lines
-    >>> map ((partOne &&& partTwo) . parse)
-    >>> bimap sum sum . unzip
+solve :: String -> (Int,Int)                -- contains parts one and two
+solve = lines                               -- split into lines
+    >>> map ((partOne &&& partTwo) . parse) -- solve each pairing
+    >>> bimap sum sum . unzip               -- sum each part
 ```
 
 ## Parsing
