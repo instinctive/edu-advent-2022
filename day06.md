@@ -4,11 +4,11 @@
 #include "prelude.hs"
 ```
 
-We're going to make the window size a parameter to the solution:
+Parts one and two differ only in the window size: 4 and 14, respectively.
 
 ```haskell
 main :: IO ()
-main = getContents >>= print . solve 4
+main = getContents >>= void . both print . (solve 4 &&& solve 14)
 ```
 
 The solution to the problem is the position of the first valid packet.
