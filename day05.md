@@ -43,8 +43,8 @@ and use the lens operators to work with it.
 ```haskell
 move :: CrateHandler -> Move -> State Ship ()
 move handler (Move n from to) = do
-    cc <- ix from <<%= drop n
-    ix to %= mappend (handler $ take n cc)
+    cc <- ix from %%= splitAt n
+    ix to %= mappend (handler cc)
 ```
 
 ## Run the crane
