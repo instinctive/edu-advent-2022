@@ -1,8 +1,7 @@
 # [Day 6: Tuning Trouble](https://adventofcode.com/2022/day/6)
 
-This is a nice _O(n log w)_ algorithm, where _w_ is the window size.
 [Here](https://github.com/instinctive/edu-advent-2022/blob/tryhard/day06.md)
-is a try-hard _O(n)_ solution using the ST monad.
+is a try-hard solution using the ST monad.
 
 ```haskell
 #include "prelude.hs"
