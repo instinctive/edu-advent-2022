@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Lens
+import Control.Monad.Extra
 import Control.Monad.State
 import Data.Array.MArray
 import Data.Array.ST
