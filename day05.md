@@ -4,7 +4,16 @@
 #include "prelude.hs"
 
 main :: IO ()
-main = getContents >>= putStrLn . run . parse
+main = getContents >>= void . both putStrLn . solve
+```
+
+Parts one and two differ in how they handle more than one crate being moved at
+a time. In part one, they move individually, reversing their order, and in part
+two they are moved all at once, keeping the same order.
+
+```haskell
+solve :: String -> (String,String)
+solve = (run reverse &&& run id) . parse
 ```
 
 ## Representation
@@ -13,21 +22,29 @@ We'll represent the ship's cargo hold as a ``Ship``: a map from integers to
 lists of characters, where an integer is the stack id and a character is a
 crate.
 
-A ``Move`` will represent moving a _single_ crate from one stack to another.
+A ``(Move`` _n from to_``)`` represents moving _n_ crates _from_ one stack _to_
+another.
 
 ```haskell
 type Ship = IntMap String
-type Move = (Int,Int)      -- (from,to)
+data Move = Move Int Int Int deriving Show
 ```
 
-Actually doing a move means taking a crate off one stack and putting it on
+The crates are handled differently in parts one and two.
+
+```haskell
+type CrateHandler = String -> String
+```
+
+Actually doing a move means taking crates off one stack and putting them on
 another. We'll put the ship itself behind the scenes in the ``State`` monad
 and use the lens operators to work with it.
 
 ```haskell
-move :: Move -> State Ship ()
-move (from, to) =
-    ix from <<%= tail >>= \(c:_) -> ix to %= (c:)
+move :: CrateHandler -> Move -> State Ship ()
+move handler (Move n from to) = do
+    cc <- ix from <<%= drop n
+    ix to %= mappend (handler $ take n cc)
 ```
 
 ## Run the crane
@@ -36,13 +53,12 @@ To get the answer, we do every move and then return the crate at
 the top of each stack.
 
 ```haskell
-run :: (Ship,[Move]) -> String
-run (ship,moves) = answer final where
-    final = flip execState ship $ traverse_ move moves
-
-answer = map top . IM.elems where
-    top (c:_) = c
-    top []    = ' '
+run :: CrateHandler -> (Ship,[Move]) -> String
+run handler (ship,moves) =
+    map head                         -- get the top crate
+    $ IM.elems                       -- of each stack
+    $ flip execState ship            -- from the ship
+    $ traverse_ (move handler) moves -- after doing all the moves
 ```
 
 ## Parsing
@@ -89,21 +105,9 @@ parseShip = reverse                -- build stacks from the bottom-up
 
 ### Parsing the moves
 
-Since the moves happen one at a time, an order like
-
-    move 3 from 4 to 5
-
-is the same as
-
-    move 1 from 4 to 5
-    move 1 from 4 to 5
-    move 1 from 4 to 5
-
-So we will expand each such move.
-
 ```haskell
 parseMoves :: [String] -> [Move]
-parseMoves = concatMap (go . words) where
+parseMoves = map (go . words) where
     go [_,n,_,from,_,to] =
-        replicate (read n) (read from, read to)
+        Move (read n) (read from) (read to)
 ```
