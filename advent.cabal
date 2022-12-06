@@ -104,3 +104,7 @@ executable day04
 executable day05
   import: shared
   main-is: day05.lhs
+
+executable day06
+  import: shared
+  main-is: day06.lhs
