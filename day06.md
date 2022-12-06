@@ -39,7 +39,7 @@ slide ary new old = do
     valid = allOf each (<=1)
 ```
 
-We will a dummy character for the initial window. The first characters we
+We will fill the initial window with a dummy character. The first characters we
 remove as the window slides along (the _prefix_) will be these dummy
 characters.
 
