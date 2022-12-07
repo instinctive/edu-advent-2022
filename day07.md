@@ -77,10 +77,11 @@ parse = T.lines           -- split into lines
     >>> filter (/= Ls)    -- discard ls commands
 
 sumFiles :: [Line] -> [Line]
-sumFiles = \case
-    LsFile a : LsFile b : more -> sumFiles $ LsFile (a+b) : more
-    line : more -> line : sumFiles more
-    [] -> []
+sumFiles = cata \case
+    Nil -> []
+    Cons (LsFile u) (LsFile v : xx) -> LsFile (u+v) : xx
+    Cons (LsFile u)             xx  -> LsFile  u    : xx
+    Cons x xx -> x : xx
 ```
 
 ## Directories
