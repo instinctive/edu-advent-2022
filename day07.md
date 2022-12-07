@@ -77,7 +77,7 @@ parse = T.lines           -- split into lines
     >>> filter (/= Ls)    -- discard ls commands
 
 sumFiles :: [Line] -> [Line]
-sumFiles = cata \case
+sumFiles = cata \case     -- sum sequential file sizes
     Nil -> []
     Cons (LsFile u) (LsFile v : xx) -> LsFile (u+v) : xx
     Cons (LsFile u)             xx  -> LsFile  u    : xx
