@@ -82,6 +82,7 @@ common shared -- {{{
    , mtl
    , random
    , random-shuffle
+   , recursion-schemes
    , split
    , text
   -- }}}

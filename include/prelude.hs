@@ -9,6 +9,7 @@ import Data.Array.MArray
 import Data.Array.ST
 import Data.Array.Unboxed
 import Data.Array.Unsafe
+import Data.Functor.Foldable
 import Data.List.Split
 import Linear.V2
 
