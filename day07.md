@@ -142,12 +142,11 @@ doLine stack = \case
     CdTop       -> pure $ ["/"]      -- go to the top level
     CdUp        -> pure $ tail stack -- pop the stack
     CdDown next -> pure $ next:stack -- push the next directory
-    LsFile size -> do
+    LsFile size -> pure stack <* do  -- no change to stack
         -- mark seen and return the prior "seen" status
         seen <- at stack . non zDir . dirSeen <<.= True
         -- if not previously seen, add size to stack directories
         when (not seen) $ for_ (tails stack) \path ->
             when (not . null $ path) $
                 at path . non zDir . dirSize += size
-        pure stack
 ```
