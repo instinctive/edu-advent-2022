@@ -49,7 +49,7 @@ data Line
     | CdDown Text -- $ cd <name>
     | Ls          -- $ ls
     | LsDir       -- dir <name>
-    | LsFile Int  -- <name> <sizes>
+    | LsFile Int  -- <size> <name>
     deriving (Eq,Show)
 
 parseLine :: Text -> Line
@@ -78,10 +78,10 @@ parse = T.lines           -- split into lines
 
 sumFiles :: [Line] -> [Line]
 sumFiles = cata \case     -- sum sequential file sizes
-    Nil -> []
     Cons (LsFile u) (LsFile v : xx) -> LsFile (u+v) : xx
     Cons (LsFile u)             xx  -> LsFile  u    : xx
     Cons x xx -> x : xx
+    Nil       -> []
 ```
 
 ## Directories
