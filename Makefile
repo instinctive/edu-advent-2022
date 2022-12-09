@@ -1,4 +1,4 @@
-.PHONY: build tests pdf
+.PHONY: build tests doc
 
 build:
 	@cabal build
@@ -6,7 +6,9 @@ build:
 tests:
 	@./runtests
 
+doc: advent.pdf
+
 DAYS := $(wildcard day*.md)
 
-pdf: ${DAYS}
+advent.pdf: ${DAYS}
 	@sed -se '$$a\\\newpage' ${DAYS} | pandoc -s --toc -o advent.pdf
