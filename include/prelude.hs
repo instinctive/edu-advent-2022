@@ -33,6 +33,3 @@ paragraphs = splitOn [""]
 
 modifyArray :: (MArray a e m, Ix i) => a i e -> i -> (e -> e) -> m ()
 modifyArray a i f = readArray a i >>= writeArray a i . f
-
-arrayValues :: (MArray a e m, Ix i) => a i e -> [i] -> m [e]
-arrayValues ary = sequence . map (readArray ary)

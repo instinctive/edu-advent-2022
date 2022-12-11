@@ -62,16 +62,18 @@ type Ary s  = STUArray s Pt Int
 type Scan s = forall s. Ary s -> [Pt] -> ST s ()
 ```
 
-We initialize the interior array, do the scan, and return the values of the
-interior points.
+We initialize the interior array, do the scan, and return the array
+limited to the interior points.
 
 ```haskell
-doInterior :: Woods -> Int -> Scan s -> [Int]
-doInterior w initial scanfn = runST do
-    let (lo,hi) = bounds w
+getInterior :: Woods -> Int -> Scan s -> UArray Pt Int
+getInterior w initial scanfn = limit $ runSTUArray do
     ary <- newArray (lo,hi) initial :: ST s (STUArray s Pt Int)
-    traverse_ (scanfn ary) (forestRanges w) -- do scans
-    arrayValues ary $ range (lo+1,hi-1)     -- return interior values
+    traverse_ (scanfn ary) (forestRanges w)
+    pure ary
+  where
+    (lo,hi) = bounds w
+    limit = ixmap (lo+1,hi-1) id
 ```
 
 ## Part One
@@ -97,7 +99,7 @@ partOne w =
     border = 2 * (rhi - rlo) + 2 * (chi - clo)
     height = (w!)                   -- height function
     shade = scanl1 max . map height -- preceeding heights
-    interior = sum $ doInterior w 0 \ary vv -> do
+    interior = sum . elems $ getInterior w 0 \ary vv -> do
         let check v h = when (height v > h) $ writeArray ary v 1
         sequence_ $ zipWith check (tail vv) (shade vv)
 ```
@@ -117,14 +119,15 @@ tree greater than or equal in height to the current tree.
 
 ```haskell
 partTwo :: Woods -> Int
-partTwo w = maximum $ doInterior w 1 \ary (v0:vv) -> do
-    -- the edge tree is the closest tree for every height
+partTwo w = maximum . elems $ getInterior w 1 \ary (v0:vv) -> do
     pos <- newArray ('0','9') v0 :: ST s (STArray s Char Pt)        
-    -- update all following trees
     for_ vv \v -> do
-        let h = w ! v                        -- height
-        let distance v' = abs . sum $ v - v' -- distance to v
-        d <- minimum . map distance <$> arrayValues pos [h..'9']
-        modifyArray ary v (* d) -- multiply into the interior value
-        writeArray pos h v      -- update closest tree of this height
+        let h = w ! v
+        let closest d h = do
+                v' <- readArray pos h
+                let d' = abs . sum $ v - v'
+                pure $ min d d'
+        d <- foldM closest maxBound [h..'9']
+        modifyArray ary v (* d)
+        writeArray pos h v
 ```
