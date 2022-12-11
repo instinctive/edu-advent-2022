@@ -25,11 +25,14 @@ import qualified Data.Text      as T
 import qualified Data.Text.IO   as T
 import qualified Data.Text.Read as T
 
+readSigned :: Integral a => Text -> a
+readSigned t = case T.signed T.decimal t of Right (i,_) -> i
+
 paragraphs :: [String] -> [[String]]
 paragraphs = splitOn [""]
 
 modifyArray :: (MArray a e m, Ix i) => a i e -> i -> (e -> e) -> m ()
 modifyArray a i f = readArray a i >>= writeArray a i . f
 
-readSigned :: Integral a => Text -> a
-readSigned t = case T.signed T.decimal t of Right (i,_) -> i
+arrayValues :: (MArray a e m, Ix i) => a i e -> [i] -> m [e]
+arrayValues ary = sequence . map (readArray ary)
