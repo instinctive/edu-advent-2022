@@ -5,8 +5,8 @@
 #include "prelude.hs"
 
 main :: IO ()
-main = T.getContents >>= void . both print 
-    . (partOne &&& partTwo) . parse
+main = T.getContents >>= void . both print . solve . parse
+  where solve = partOne &&& partTwo
 ```
 
 ## Parsing
@@ -20,8 +20,7 @@ type Pt = V2 Int -- V2 row column
 type Woods = UArray Pt Char
 
 parse :: Text -> Woods
-parse = T.lines
-    >>> listArray . mkBounds <*> mkValues
+parse = T.lines >>> listArray . mkBounds <*> mkValues
   where
     mkBounds tt = (V2 1 1, V2 nrows ncols) where
         nrows = length tt               -- number of rows
@@ -80,29 +79,25 @@ doInterior w initial scanfn = runST do
 The answer to part one is the size of the border (which is always visible)
 plus the visible trees of the interior.
 
-```haskell
-partOne :: Woods -> Int
-partOne w = borderSize w + visibleTrees w
-
-borderSize :: Woods -> Int
-borderSize (bounds -> (V2 rlo clo, V2 rhi chi)) =
-    2 * (rhi - rlo) + 2 * (chi - clo)
-```
-
 A tree is visible if its height is greater than all the trees that preceed it
 in the list. For every tree in the list of points, we ``check`` its height
 against the ``shade`` (preceeding heights) up to that point.
 $$\hbox{\tt shade [3,2,5,1]} \Rightarrow \hbox{\tt [3,3,5,5]}$$
+
 We initialize the working array to 0, and if we can see the tree from any
 direction, we set it to 1. When we're done, we sum the interior values to get
 the total number of visible trees.
 
 ```haskell
-visibleTrees :: Woods -> Int
-visibleTrees w =
-    let height = (w!) in                    -- height function
-    let shade = scanl1 max . map height in  -- preceeding heights
-    sum $ doInterior w 0 \ary vv -> do
+partOne :: Woods -> Int
+partOne w =
+    border + interior
+  where
+    (V2 rlo clo, V2 rhi chi) = bounds w
+    border = 2 * (rhi - rlo) + 2 * (chi - clo)
+    height = (w!)                   -- height function
+    shade = scanl1 max . map height -- preceeding heights
+    interior = sum $ doInterior w 0 \ary vv -> do
         let check v h = when (height v > h) $ writeArray ary v 1
         sequence_ $ zipWith check (tail vv) (shade vv)
 ```
