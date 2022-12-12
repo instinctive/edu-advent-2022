@@ -11,3 +11,4 @@
 - [Day 9: Rope Bridge](day09.md) ([problem](https://adventofcode.com/2022/day/9))
 - [Day 10: Cathode-Ray Tube](day10.md) ([problem](https://adventofcode.com/2022/day/10))
 - [Day 11: Monkey in the Middle](day11.md) ([problem](https://adventofcode.com/2022/day/11))
+- [Day 12: Hill Climbing Algorithm](day12.md) ([problem](https://adventofcode.com/2022/day/12))
