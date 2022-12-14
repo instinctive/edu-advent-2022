@@ -13,3 +13,4 @@
 - [Day 11: Monkey in the Middle](day11.md) ([problem](https://adventofcode.com/2022/day/11))
 - [Day 12: Hill Climbing Algorithm](day12.md) ([problem](https://adventofcode.com/2022/day/12))
 - [Day 13: Distress Signal](day13.md) ([problem](https://adventofcode.com/2022/day/13))
+- [Day 14: Regolith Reservoir](day14.md) ([problem](https://adventofcode.com/2022/day/14))

@@ -139,3 +139,7 @@ executable day12
 executable day13
   import: shared
   main-is: day13.lhs
+
+executable day14
+  import: shared
+  main-is: day14.lhs
